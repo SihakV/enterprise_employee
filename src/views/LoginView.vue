@@ -1,6 +1,7 @@
 <script setup>
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from 'axios' // Import Axios
 import { mdiAccount, mdiAsterisk } from '@mdi/js'
 import SectionFullScreen from '@/components/SectionFullScreen.vue'
 import CardBox from '@/components/CardBox.vue'
@@ -12,15 +13,36 @@ import BaseButtons from '@/components/BaseButtons.vue'
 import LayoutGuest from '@/layouts/LayoutGuest.vue'
 
 const form = reactive({
-  login: 'john.doe',
-  pass: 'highly-secure-password-fYjUw-',
-  remember: true
+  login: '',
+  pass: '',
+  remember: false
 })
+
+const errorMessage = ref('') // To store error messages
 
 const router = useRouter()
 
-const submit = () => {
-  router.push('/dashboard')
+const submit = async () => {
+  try {
+    const formData = new FormData()
+    formData.append('email', form.login)
+    formData.append('password', form.pass)
+    // Replace `http://yourbackenddomain.com/api/v1/admin/login` with your actual login endpoint
+    const response = await axios.post('http://127.0.0.1:8080/api/v1/employee/login', formData)
+    // Assuming the token is returned in the response
+    const token = response.data.token
+    // Store the token in localStorage or sessionStorage
+    localStorage.setItem('authToken', token)
+    // Redirect to dashboard
+    router.push('/dashboard')
+  } catch (error) {
+    // Handle errors (e.g., show error message)
+    if (error.response && error.response.data && error.response.data.error) {
+      errorMessage.value = error.response.data.error
+    } else {
+      errorMessage.value = 'An error occurred.'
+    }
+  }
 }
 </script>
 
@@ -28,6 +50,8 @@ const submit = () => {
   <LayoutGuest>
     <SectionFullScreen v-slot="{ cardClass }" bg="purplePink">
       <CardBox :class="cardClass" is-form @submit.prevent="submit">
+        <!-- Display error message if it exists -->
+        <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
         <FormField label="Login" help="Please enter your login">
           <FormControl
             v-model="form.login"
@@ -36,28 +60,24 @@ const submit = () => {
             autocomplete="username"
           />
         </FormField>
-
         <FormField label="Password" help="Please enter your password">
           <FormControl
             v-model="form.pass"
             :icon="mdiAsterisk"
             type="password"
             name="password"
-            autocomplete="current-password"
           />
         </FormField>
-
         <FormCheckRadio
           v-model="form.remember"
           name="remember"
-          label="Remember"
+          label="Remember me"
           :input-value="true"
         />
-
         <template #footer>
           <BaseButtons>
             <BaseButton type="submit" color="info" label="Login" />
-            <BaseButton to="/dashboard" color="info" outline label="Back" />
+            <!-- <BaseButton to="/dashboard" color="info" outline label="Back" /> -->
           </BaseButtons>
         </template>
       </CardBox>
