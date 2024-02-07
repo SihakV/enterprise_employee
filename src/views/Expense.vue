@@ -23,7 +23,7 @@ const expenses = ref([]); // To store expenses data
 
 const fetchExpenses = async () => {
   try {
-    const response = await axios.get('http://localhost:8080/api/v1/expense/getAll');
+    const response = await axios.get('http://localhost:8080/api/v1/expense/getByUser');
     expenses.value = response.data.data;
   } catch (error) {
     console.error('Error fetching expenses:', error);
@@ -50,7 +50,7 @@ const submitExpenseClaim = async () => {
       });
       alert('Expense submitted successfully');
       closeFormPopup();
-      const response = await axios.get('http://localhost:8080/api/v1/expense/getAll');
+      const response = await axios.get('http://localhost:8080/api/v1/expense/getByUser');
       expenses.value = response.data.data; // Fetch expenses again after successful submission
     } catch (error) {
       console.error(error);
@@ -69,7 +69,7 @@ const deleteExpense = async (expenseId) => {
       await axios.delete(`http://localhost:8080/api/v1/expense/delete/${expenseId}`);
       alert('Expense deleted successfully');
       // Refresh the expenses list
-      const response = await axios.get('http://localhost:8080/api/v1/expense/getAll');
+      const response = await axios.get('http://localhost:8080/api/v1/expense/getByUser');
       expenses.value = response.data.data;
     } catch (error) {
       console.error(error);
