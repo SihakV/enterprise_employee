@@ -12,6 +12,7 @@ import {
   mdiPalette,
   mdiReact,
   mdiCurrencyUsd,
+  mdiBagChecked,
   mdiCreditCardCheckOutline
 } from '@mdi/js'
 
@@ -31,11 +32,16 @@ export default [
     label: 'Expense',
     icon: mdiCurrencyUsd
   },
-  // {
-  //   to: '/tables',
-  //   label: 'Tables',
-  //   icon: mdiTable
-  // },
+  {
+    to: '/leave',
+    label: 'Leave',
+    icon: mdiBagChecked
+  },
+  {
+    to: '/profile',
+    label: 'Profile',
+    icon: mdiAccountCircle
+  },
   // {
   //   to: '/forms',
   //   label: 'Forms',
@@ -56,11 +62,11 @@ export default [
   //   label: 'Styles',
   //   icon: mdiPalette
   // },
-  {
-    to: '/login',
-    label: 'Login',
-    icon: mdiLock
-  },
+  // {
+  //   to: '/login',
+  //   label: 'Login',
+  //   icon: mdiLock
+  // },
   // {
   //   to: '/error',
   //   label: 'Error',

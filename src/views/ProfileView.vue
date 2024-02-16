@@ -1,84 +1,125 @@
 <script setup>
-import { reactive } from 'vue'
-import { useMainStore } from '@/stores/main'
-import { mdiAccount, mdiMail, mdiAsterisk, mdiFormTextboxPassword, mdiGithub } from '@mdi/js'
+import { reactive, onMounted } from 'vue'
+import axios from 'axios'
+import { mdiAccount, mdiMail } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
 import BaseDivider from '@/components/BaseDivider.vue'
-import FormField from '@/components/FormField.vue'
-import FormControl from '@/components/FormControl.vue'
-import FormFilePicker from '@/components/FormFilePicker.vue'
-import BaseButton from '@/components/BaseButton.vue'
-import BaseButtons from '@/components/BaseButtons.vue'
 import UserCard from '@/components/UserCard.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 
-const mainStore = useMainStore()
+// Reactive object to store user profile data
+const userProfile = reactive({
+  name: '',
+  email: '',
+  userid: '',
+  role: '',
+  position: '',
+  dob: '',
+  phone: '',
+  salary: '',
+  // Add other fields as necessary
+});
 
-const profileForm = reactive({
-  name: mainStore.userName,
-  email: mainStore.userEmail
-})
+// Function to fetch user profile
+const fetchUserProfile = async () => {
+  try {
+    const response = await axios.get('http://localhost:8080/api/v1/user/getProfile', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('authToken')}` // Assuming JWT is stored in localStorage
+      }
+    });
+    const userData = response.data.data[0];
+    userProfile.name = userData.Username;
+    userProfile.email = userData.Email;
+    userProfile.userid = userData.UserId;
+    userProfile.role = userData.RoleId;
+    userProfile.position = userData.PositionId;
+    userProfile.salary = userData.Salary;
+    // Set other fields similarly
+    // For example:
+    userProfile.dob = userData.Dob;
+    userProfile.phone = userData.Phone;
 
-const passwordForm = reactive({
-  password_current: '',
-  password: '',
-  password_confirmation: ''
-})
+    // Set other fields similarly
+  } catch (error) {
+    console.error('Failed to fetch profile:', error);
+  }
+};
 
-const submitProfile = () => {
-  mainStore.setUser(profileForm)
-}
-
-const submitPass = () => {
-  //
-}
+// Fetch user profile when component is mounted
+onMounted(fetchUserProfile);
 </script>
 
 <template>
   <LayoutAuthenticated>
     <SectionMain>
-      <SectionTitleLineWithButton :icon="mdiAccount" title="Profile" main>
-      </SectionTitleLineWithButton>
+      <SectionTitleLineWithButton :icon="mdiAccount" title="Profile" main></SectionTitleLineWithButton>
 
       <UserCard class="mb-6" />
 
-      <div class="grid grid-cols-1 lg:grid-cols-1 gap-6">
-        <CardBox is-form @submit.prevent="submitProfile">
-          <FormField label="Avatar" help="Max 500kb">
-            <FormFilePicker label="Upload" />
-          </FormField>
+      <CardBox>
+        <div class="grid grid-cols-2 gap-4 p-4">
 
-          <FormField label="Name" help="Required. Your name">
-            <FormControl
-              v-model="profileForm.name"
-              :icon="mdiAccount"
-              name="username"
-              required
-              autocomplete="username"
-            />
-          </FormField>
-          <FormField label="E-mail" help="Required. Your e-mail">
-            <FormControl
-              v-model="profileForm.email"
-              :icon="mdiMail"
-              type="email"
-              name="email"
-              required
-              autocomplete="email"
-            />
-          </FormField>
+          <div>
+            <div class="mb-4">
+              <h2 class="font-semibold">ID:</h2>
+              <p>{{ userProfile.userid }}</p>
+            </div>
 
-          <template #footer>
-            <BaseButtons>
-              <BaseButton color="info" type="submit" label="Submit" />
-              <BaseButton color="info" label="Options" outline />
-            </BaseButtons>
-          </template>
-        </CardBox>
+            <BaseDivider />
 
-      </div>
+            <div class="mb-4">
+              <h2 class="font-semibold">Name:</h2>
+              <p>{{ userProfile.name }}</p>
+            </div>
+
+            <BaseDivider />
+
+            <div class="mb-4">
+              <h2 class="font-semibold">Email:</h2>
+              <p>{{ userProfile.email }}</p>
+            </div>
+
+            <BaseDivider />
+
+            <div class="mb-4">
+              <h2 class="font-semibold">Phone:</h2>
+              <p>{{ userProfile.phone }}</p>
+            </div>
+          </div>
+
+          <div>
+            <div class="mb-4">
+              <h2 class="font-semibold">Date of Birth:</h2>
+              <p>{{ userProfile.dob.substring(0, 10) }}</p>
+            </div>
+
+            <BaseDivider />
+
+            <div class="mb-4">
+              <h2 class="font-semibold">Role:</h2>
+              <p>{{ userProfile.role }}</p>
+            </div>
+
+            <BaseDivider />
+
+            <div class="mb-4">
+              <h2 class="font-semibold">Position:</h2>
+              <p>{{ userProfile.position }}</p>
+            </div>
+
+            <BaseDivider />
+
+            <div class="mb-4">
+              <h2 class="font-semibold">Salary:</h2>
+              <p>{{ userProfile.salary }}</p>
+            </div>
+          </div>
+
+        </div>
+      </CardBox>
     </SectionMain>
   </LayoutAuthenticated>
 </template>

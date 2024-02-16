@@ -8,22 +8,26 @@ import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.
 import BaseButton from '@/components/BaseButton.vue'
 import axios from 'axios';
 
-
 const showFormPopup = ref(false)
 const title = ref('')
 const amount = ref(0)
 const image = ref(null) // Changed from expenseFile
 const description = ref('')
+const expenses = ref([]); // To store expenses data
 
 const openFormPopup = () => {
   showFormPopup.value = true
 }
 
-const expenses = ref([]); // To store expenses data
+console.log(localStorage.getItem('authToken'));
 
 const fetchExpenses = async () => {
   try {
-    const response = await axios.get('http://localhost:8080/api/v1/expense/getByUser');
+    const response = await axios.get('http://localhost:8080/api/v1/expense/getByUser', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
     expenses.value = response.data.data;
   } catch (error) {
     console.error('Error fetching expenses:', error);
@@ -45,13 +49,13 @@ const submitExpenseClaim = async () => {
     try {
       await axios.post('http://localhost:8080/api/v1/expense/create', formData, {
         headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           'Content-Type': 'multipart/form-data',
         }
       });
       alert('Expense submitted successfully');
       closeFormPopup();
-      const response = await axios.get('http://localhost:8080/api/v1/expense/getByUser');
-      expenses.value = response.data.data; // Fetch expenses again after successful submission
+      fetchExpenses(); // Fetch expenses again after successful submission
     } catch (error) {
       console.error(error);
       alert('Error submitting expense: ' + error.message);
@@ -62,21 +66,6 @@ const submitExpenseClaim = async () => {
 };
 
 
-const deleteExpense = async (expenseId) => {
-  const confirmed = confirm('Are you sure you want to delete this expense?');
-  if (confirmed) {
-    try {
-      await axios.delete(`http://localhost:8080/api/v1/expense/delete/${expenseId}`);
-      alert('Expense deleted successfully');
-      // Refresh the expenses list
-      const response = await axios.get('http://localhost:8080/api/v1/expense/getByUser');
-      expenses.value = response.data.data;
-    } catch (error) {
-      console.error(error);
-      alert('Error deleting expense: ' + error.message);
-    }
-  }
-}
 
 const closeFormPopup = () => {
   showFormPopup.value = false
@@ -164,7 +153,6 @@ const handleDragOver = (event) => {
                 <th class="px-6 py-3 bg-gray-50 dark:bg-gray-800">Description</th>
                 <th class="px-6 py-3 bg-gray-50 dark:bg-gray-800">Proof of Expense</th>
                 <th class="px-6 py-3 bg-gray-50 dark:bg-gray-800">Status</th>
-                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-800"></th> <!-- Added Actions column -->
               </tr>
             </thead>
             <tbody>
@@ -178,16 +166,6 @@ const handleDragOver = (event) => {
                 <td class="px-6 py-4">
                   <span v-if="expense.Status === 1" class="text-orange-500">Pending</span>
                   <span v-else class="text-green-500">Approved</span>
-                </td>
-                <td class="px-6 py-4">
-                  <BaseButton v-if="expense.Status === 1"
-                    @click="deleteExpense(expense.ExpenseId)"
-                    label="Delete"
-                    color="danger"
-                    rounded-full
-                    small
-                    class="hover:bg-red-500"
-                  />
                 </td>
               </tr>
             </tbody>

@@ -32,7 +32,7 @@ const menuClick = (event, item) => {
   }
 
   if (item.isLogout) {
-    //
+    
   }
 }
 </script>

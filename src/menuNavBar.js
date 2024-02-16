@@ -22,16 +22,10 @@ export default [
         to: '/profile'
       },
       {
-        icon: mdiCogOutline,
-        label: 'Settings'
-      },
-      {
-        isDivider: true
-      },
-      {
         icon: mdiLogout,
         label: 'Log Out',
-        isLogout: true
+        isLogout: true,
+        to: '/login'
       }
     ]
   },
@@ -41,10 +35,4 @@ export default [
     isDesktopNoLabel: true,
     isToggleLightDark: true
   },
-  {
-    icon: mdiLogout,
-    label: 'Log out',
-    isDesktopNoLabel: true,
-    isLogout: true
-  }
 ]

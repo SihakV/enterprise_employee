@@ -71,6 +71,14 @@ const routes = [
   },
   {
     meta: {
+      title: 'Expense'
+    },
+    path: '/leave',
+    name: 'leave',
+    component: () => import('@/views/Leave.vue')
+  },
+  {
+    meta: {
       title: 'Responsive layout'
     },
     path: '/responsive',
@@ -102,5 +110,16 @@ const router = createRouter({
     return savedPosition || { top: 0 }
   }
 })
+
+router.beforeEach((to, from, next) => {
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const authToken = localStorage.getItem('authToken');
+
+  if (requiresAuth && !authToken) {
+    next('/login');
+  } else {
+    next();
+  }
+});
 
 export default router

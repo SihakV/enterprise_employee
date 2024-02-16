@@ -4,6 +4,9 @@ import { computed } from 'vue'
 import AsideMenuList from '@/components/AsideMenuList.vue'
 import AsideMenuItem from '@/components/AsideMenuItem.vue'
 import BaseIcon from '@/components/BaseIcon.vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter();
 
 defineProps({
   menu: {
@@ -22,7 +25,15 @@ const logoutItem = computed(() => ({
 }))
 
 const menuClick = (event, item) => {
-  emit('menu-click', event, item)
+  if (item.isLogout) {
+    // Remove the token from local storage
+    localStorage.removeItem('token');
+
+    // Redirect the user to the login page
+    router.push('/login');
+  } else {
+    emit('menu-click', event, item);
+  }
 }
 
 const asideLgCloseClick = (event) => {

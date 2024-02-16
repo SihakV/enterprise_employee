@@ -33,8 +33,9 @@ const submit = async () => {
     const token = response.data.token
     // Store the token in localStorage or sessionStorage
     localStorage.setItem('authToken', token)
+    console.log(localStorage.getItem('authToken')); // Use 'authToken' instead of 'token'
     // Redirect to dashboard
-    router.push('/dashboard')
+    router.push('/expense')
   } catch (error) {
     // Handle errors (e.g., show error message)
     if (error.response && error.response.data && error.response.data.error) {

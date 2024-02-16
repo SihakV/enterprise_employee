@@ -34,7 +34,7 @@ mainStore.fetchSampleHistory()
 // }
 
 // Default title tag
-const defaultDocumentTitle = 'Admin One Vue 3 Tailwind'
+const defaultDocumentTitle = 'Employee Self Service Portal'
 
 // Set document title from route meta
 router.afterEach((to) => {
