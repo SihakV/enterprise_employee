@@ -8,6 +8,7 @@ import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.
 import BaseButton from '@/components/BaseButton.vue'
 import axios from 'axios';
 
+const cloudBaseUrl = 'https://enterprise-class.sgp1.digitaloceanspaces.com';
 const showFormPopup = ref(false)
 const title = ref('')
 const amount = ref(0)
@@ -161,11 +162,12 @@ const handleDragOver = (event) => {
                 <td class="px-6 py-4">${{ expense.Amount }}</td>
                 <td class="px-6 py-4">{{ expense.Description }}</td>
                 <td class="px-6 py-4">
-                  <a :href="expense.ExpenseFile" target="_blank" class="rounded-full bg-blue-500 text-white px-4 py-2 hover:bg-blue-600">View File</a>
+                  <a :href="`${cloudBaseUrl}/${expense.ExpenseFile}`" target="_blank" rel="noopener noreferrer" class="rounded-full bg-blue-500 text-white px-4 py-2 hover:bg-blue-600">View File</a>
                 </td>
                 <td class="px-6 py-4">
                   <span v-if="expense.Status === 1" class="text-orange-500">Pending</span>
-                  <span v-else class="text-green-500">Approved</span>
+                  <span v-else-if="expense.Status === 2" class="text-green-500">Approved</span>
+                  <span v-else-if="expense.Status === 0" class="text-red-500">Rejected</span>
                 </td>
               </tr>
             </tbody>

@@ -1,18 +1,17 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 
 export const useMainStore = defineStore('main', () => {
-  const userName = ref('John Doe')
-  const userEmail = ref('doe.doe.doe@example.com')
 
-  const userAvatar = computed(
-    () =>
-      `https://api.dicebear.com/7.x/avataaars/svg?seed=${userEmail.value.replace(
-        /[^a-z0-9]+/gi,
-        '-'
-      )}`
-  )
+  const userName = ref('')
+  const userEmail = ref('')
+  const userProfilePic = ref('');
+  const cloudBaseUrl = 'https://enterprise-class.sgp1.digitaloceanspaces.com';
+
+  const userAvatar = computed(() => {
+    return userProfilePic.value ? `${cloudBaseUrl}/${userProfilePic.value}` : '';
+  });
 
   const isFieldFocusRegistered = ref(false)
 
@@ -26,6 +25,29 @@ export const useMainStore = defineStore('main', () => {
     if (payload.email) {
       userEmail.value = payload.email
     }
+    if(payload.profile)
+    {
+      userProfilePic.value = payload.profile;
+    }
+  }
+
+  async function fetchUserProfile() {
+    try {
+      const response = await axios.get('http://localhost:8080/api/v1/user/getProfile', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}` // Assuming JWT is stored in localStorage
+        }
+      })
+      const userData = response.data.data[0]
+      setUser({
+        name: userData.Username,
+        email: userData.Email,
+        profile: userData.Profile,
+        // You can also set other fields here if necessary
+      })
+    } catch (error) {
+      console.error('Failed to fetch profile:', error)
+    }
   }
 
   function fetchSampleClients() {
@@ -35,7 +57,7 @@ export const useMainStore = defineStore('main', () => {
         clients.value = result?.data?.data
       })
       .catch((error) => {
-        alert(error.message)
+        console.error('Error fetching clients:', error.message)
       })
   }
 
@@ -46,9 +68,11 @@ export const useMainStore = defineStore('main', () => {
         history.value = result?.data?.data
       })
       .catch((error) => {
-        alert(error.message)
+        console.error('Error fetching history:', error.message)
       })
   }
+
+  fetchUserProfile()
 
   return {
     userName,
@@ -58,6 +82,7 @@ export const useMainStore = defineStore('main', () => {
     clients,
     history,
     setUser,
+    fetchUserProfile, // Make the function available to call from components
     fetchSampleClients,
     fetchSampleHistory
   }

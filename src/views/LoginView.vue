@@ -11,6 +11,10 @@ import FormControl from '@/components/FormControl.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import LayoutGuest from '@/layouts/LayoutGuest.vue'
+import { useMainStore } from '@/stores/main'
+import { onMounted } from 'vue'
+
+const store = useMainStore()
 
 const form = reactive({
   login: '',
@@ -35,6 +39,7 @@ const submit = async () => {
     localStorage.setItem('authToken', token)
     console.log(localStorage.getItem('authToken')); // Use 'authToken' instead of 'token'
     // Redirect to dashboard
+    store.fetchUserProfile();
     router.push('/expense')
   } catch (error) {
     // Handle errors (e.g., show error message)
@@ -45,6 +50,8 @@ const submit = async () => {
     }
   }
 }
+
+
 </script>
 
 <template>

@@ -8,6 +8,7 @@ import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.
 import BaseButton from '@/components/BaseButton.vue'
 import axios from 'axios';
 
+const cloudBaseUrl = 'https://enterprise-class.sgp1.digitaloceanspaces.com';
 const showFormPopup = ref(false)
 const title = ref('')
 const description = ref('')
@@ -31,6 +32,7 @@ const fetchLeaveRequests = async () => {
       }
     });
     leaveRequests.value = response.data.data;
+    console.log(leaveRequests)
   } catch (error) {
     console.error('Error fetching leave requests:', error);
   }
@@ -59,7 +61,7 @@ const submitLeaveRequest = async () => {
       },
     });
     alert('Leave request submitted successfully');
-    etchLeaveRequests();// Fetch leave requests again after successful submission
+    FetchLeaveRequests();// Fetch leave requests again after successful submission
   } catch (error) {
     console.error(error);
     alert('Error submitting leave request: ' + error.message);
@@ -154,13 +156,13 @@ const handleDragOver = (event) => {
                 <td class="px-6 py-4">{{ leaveRequest.Title }}</td>
                 <td class="px-6 py-4">{{ leaveRequest.Description }}</td>
                 <td class="px-6 py-4">
-                  <a :href="leaveRequest.LeaveFile" target="_blank"
-                    class="rounded-full bg-blue-500 text-white px-4 py-2 hover:bg-blue-600">View File</a>
+                  <a :href="`${cloudBaseUrl}/${leaveRequest.LeaveFile}`" target="_blank" class="rounded-full bg-blue-500 text-white px-4 py-2 hover:bg-blue-600">View File</a>
                 </td>
                 <td class="px-6 py-4">{{ new Date(leaveRequest.LeaveDateFrom).toISOString().split('T')[0] }} - {{ new Date(leaveRequest.LeaveDateTo).toISOString().split('T')[0] }}</td>
                 <td class="px-6 py-4">
-                  <span v-if="leaveRequest.Status === 1" class="text-orange-500">Pending</span>
-                  <span v-else class="text-green-500">Approved</span>
+                  <span v-if="expense.Status === 1" class="text-orange-500">Pending</span>
+                  <span v-else-if="expense.Status === 2" class="text-green-500">Approved</span>
+                  <span v-else-if="expense.Status === 0" class="text-red-500">Rejected</span>
                 </td>
               </tr>
             </tbody>
